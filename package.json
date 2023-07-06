@@ -1,0 +1,14 @@
+{
+  "name": "livebusupdate",
+  "version": "1.0.0",
+  "description": "",
+  "main": "busBoard.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ad",
+  "license": "ISC",
+  "dependencies": {
+    "node-fetch": "^3.3.1"
+  }
+}
