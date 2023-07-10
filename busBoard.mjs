@@ -3,7 +3,7 @@ import fetch from "node-fetch";
 // Import readline-sync to get user input
 import * as readline_sync from "readline-sync";
 // Import winston for error logging and create logger
-import * as winston from "winston";
+import winston from "winston";
 const logger = winston.createLogger({
     transports: [
       new winston.transports.Console(),
@@ -28,6 +28,12 @@ async function busBoard(){
 async function findCoordinates(userPostCode){
     
     const postCodeResponse = await fetch(`https://api.postcodes.io/postcodes/${userPostCode}`);
+    
+    if(!postCodeResponse.ok){
+        logger.info(`error when retrieving coordinate data from postcode ${userPostCode} `);
+        
+        throw Error (`Fetching coordinates has not been successful for postcode ${userPostCode}`);
+    }
     const coordData = await postCodeResponse.json();
 
     return {
@@ -44,6 +50,9 @@ async function getLocalStopPoints (userCoords, searchRadius){
     const response = await stopPointsResponse.json();
     
     const stopPoints = response.stopPoints
+
+    //if (stopPoints === )
+
 
     stopPoints.sort((stopPointA, stopPointB)=> stopPointA.distance - stopPointB.distance);
 
