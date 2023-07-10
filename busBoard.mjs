@@ -1,6 +1,15 @@
-// Import the fetch and readline modules
+// Import fetch module to retrieve API Data
 import fetch from "node-fetch";
+// Import readline-sync to get user input
 import * as readline_sync from "readline-sync";
+// Import winston for error logging and create logger
+import * as winston from "winston";
+const logger = winston.createLogger({
+    transports: [
+      new winston.transports.Console(),
+      new winston.transports.File({ filename: 'combined.log' })
+    ]
+});
 
 
 async function busBoard(){
@@ -9,14 +18,14 @@ async function busBoard(){
     // let userPostCode = "n225na";
     let searchRadius = "200";
 
-    const userCoords = await findCoordinate(userPostCode);
+    const userCoords = await findCoordinates(userPostCode);
     const localStopPoints = await getLocalStopPoints(userCoords, searchRadius);
 
     printClosestArrivals (localStopPoints);
 }
 
 
-async function findCoordinate(userPostCode){
+async function findCoordinates(userPostCode){
     
     const postCodeResponse = await fetch(`https://api.postcodes.io/postcodes/${userPostCode}`);
     const coordData = await postCodeResponse.json();
