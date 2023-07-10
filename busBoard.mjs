@@ -1,33 +1,20 @@
-// Import the readline module
-
-//import * as readline from "readline";
-
-//const readline = require('readline-sync');
-
-// import fetch from "node-fetch";
-
-// async function busBoard(){
-   
-//     const busStopCode = "490008660N"; 
-//     const fetchArrivalData = await fetch(`https://api.tfl.gov.uk/StopPoint/${busStopCode}/Arrivals`);
-//     const busArrivalInfo = await fetchArrivalData.json();
-
-//     //console.log(busArrivalInfo)
+// Import the fetch and readline modules
+import fetch from "node-fetch";
+import * as readline_sync from "readline-sync";
 
 
-//     for(let i = 0; i < busArrivalInfo.length; i++){
+async function busBoard(){
+    // find longitude and latitude
+    let userPostCode = readline_sync.question("Please enter a London Postcode: ");
+    // let userPostCode = "n225na";
+    let searchRadius = "200";
 
-//         const NextBusInfo = busArrivalInfo[i];
+    const userCoords = await findCoordinate(userPostCode);
+    const localStopPoints = await getLocalStopPoints(userCoords, searchRadius);
 
-//         console.log(`Next bus arriving is ${NextBusInfo.lineName} in ${NextBusInfo.timeToStation} seconds `)
-//     }
-// }
+    printClosestArrivals (localStopPoints);
+}
 
-// busBoard()
-
-// find longitude and latitude
-let userPostCode ="n225na";
-let searchRadius = "200";
 
 async function findCoordinate(userPostCode){
     
@@ -37,15 +24,8 @@ async function findCoordinate(userPostCode){
     return {
         userLon: coordData.result.longitude,
         userLat: coordData.result.latitude,
-    
     }
-    
-    
 }
-
-const userCoords = await findCoordinate(userPostCode);
-
-console.log(userCoords); 
 
 
 // find local bus stops 
@@ -62,16 +42,8 @@ async function getLocalStopPoints (userCoords, searchRadius){
 
 }
 
-    
-    
-
-const localStopPoints = await getLocalStopPoints(userCoords, searchRadius);
-
-console.log(localStopPoints)
-
 
 //Print arrivals for 3 closest stops
-
 async function printClosestArrivals (localStopPoints){
     
     for (let i =0; i < localStopPoints.length && i<3; i++){
@@ -91,4 +63,4 @@ async function printClosestArrivals (localStopPoints){
 
 }
 
-printClosestArrivals (localStopPoints);
+busBoard();
