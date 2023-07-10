@@ -27,23 +27,68 @@
 
 // find longitude and latitude
 let userPostCode ="n225na";
-let searchRadius = "500";
+let searchRadius = "200";
 
 async function findCoordinate(userPostCode){
     
     const postCodeResponse = await fetch(`https://api.postcodes.io/postcodes/${userPostCode}`);
     const coordData = await postCodeResponse.json();
 
-    // const userLon = coordData.result.longitude;
-    // const userLat = coordData.result.latitude;
-    const retrievedCoords = {
+    return {
         userLon: coordData.result.longitude,
         userLat: coordData.result.latitude,
-    };
-    return retrievedCoords;
+    
+    }
+    
     
 }
 
-const userCoords = findCoordinate(userPostCode);
+const userCoords = await findCoordinate(userPostCode);
 
-console.log(userCoords);
+console.log(userCoords); 
+
+
+// find local bus stops 
+async function getLocalStopPoints (userCoords, searchRadius){
+
+    const stopPointsResponse = await fetch(`https://api.tfl.gov.uk/StopPoint/?lat=${userCoords.userLat}&lon=${userCoords.userLon}&stopTypes=NaptanPublicBusCoachTram&radius=${searchRadius}`)
+    const response = await stopPointsResponse.json();
+    
+    const stopPoints = response.stopPoints
+
+    stopPoints.sort((stopPointA, stopPointB)=> stopPointA.distance - stopPointB.distance);
+
+    return stopPoints;
+
+}
+
+    
+    
+
+const localStopPoints = await getLocalStopPoints(userCoords, searchRadius);
+
+console.log(localStopPoints)
+
+
+//Print arrivals for 3 closest stops
+
+async function printClosestArrivals (localStopPoints){
+    
+    for (let i =0; i < localStopPoints.length && i<3; i++){
+
+        const fetchArrivalData = await fetch(`https://api.tfl.gov.uk/StopPoint/${localStopPoints[i].naptanId}/Arrivals`);
+        const busArrivalInfo = await fetchArrivalData.json();
+
+
+
+        for(let j = 0; j < busArrivalInfo.length; j++){
+
+            const NextBusInfo = busArrivalInfo[j];
+
+            console.log(`Next bus arriving is ${NextBusInfo.lineName} in ${NextBusInfo.timeToStation} seconds `)
+        }
+    }
+
+}
+
+printClosestArrivals (localStopPoints);
